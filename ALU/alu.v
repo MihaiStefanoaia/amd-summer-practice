@@ -30,8 +30,8 @@ module M_ALU(   output reg[7:0] ALU_OUT_TMP,
                 end
                 else    //not sure if ok
                 begin
-                    ALU_OUT_TMP <= 255;
-                    FLAG_TMP <= 4'h4;
+                    ALU_OUT_TMP <= 0;
+                    FLAG_TMP <= 4'h1;
                 end
             end
             4'h4:begin//left shift

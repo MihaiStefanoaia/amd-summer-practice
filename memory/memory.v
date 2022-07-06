@@ -35,6 +35,8 @@ module MEMORY(  output reg [31:0]D_OUT,
     end
 endmodule
 
+// Code your testbench here
+// or browse Examples
 module tester();
     wire [31:0] D_OUT;
     reg  [31:0] Din;
@@ -49,6 +51,8 @@ module tester();
 
     initial
     begin
+      $dumpfile("dump.vcd");
+      $dumpvars(0,Addr, Din, D_OUT, RW, Valid, CLK,RESET);
         $display("Addr      Din    D_OUT RW Valid CLK");
         $monitor("  %h %h %h  %b     %b   %b %d",Addr, Din, D_OUT, RW, Valid, CLK, $time);
         
@@ -71,19 +75,54 @@ module tester();
         Din   = 32'hDFD6BB42;
         RW    = 1;
 
-        //move back to address 0 and read the contents
-#10     RW    = 0;
-        Addr  = 0;
-
-        //move back to address 8 and read the contents
+        //move to address 4 and read the contents
 #10     RW    = 0;
         Addr  = 4;
 
+        //move back to address 0 and read the contents
+#20     RW    = 0;
+        Addr  = 0;
+
+      
+		//reset the memory
+#10     RESET = 1;
+        Valid = 0;
+        Addr  = 0;
+        RW    = 0;
+        Din   = 32'hACBD4432;
+
+        //clear the reset and read address 0
+#5      RESET = 0;
 #5      Valid = 1;
+      
+        //read address 4
+#10     Addr = 4;
+      
+      
+		//write to address 0
+#10		Addr = 0;
+      	RW = 1;
+      
+        //read the contents
+#10     RW    = 0;
+
+        //disable the chip and move to different address and write a different value to it
+#10     Addr  = 4;
+        Din   = 32'hDFD6BB42;
+        RW    = 1;
+
+        //move to address 4 and read the contents
+#10     RW    = 0;
+        Addr  = 4;
+
+        //move back to address 0 and read the contents
+#20     RW    = 0;
+        Addr  = 0;
 
 #10     $finish();
     end
 endmodule
+
 
 module Clock(output c);
     reg value;

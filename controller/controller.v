@@ -29,11 +29,18 @@ module DEC_INPUT_KEY(   output reg ACTIVE,
                         input      VALID,
                         input      RESET,
                         input      CLK,
-                        output reg [2:0] DEBUG_STATE);
+                        output  [2:0] DEBUG_STATE);
     reg s0;
     reg s1;
     reg s2;
+    wire s0_;
+    wire s1_;
+    wire s2_;
+    assign s0_ = (s2 & ~s1 & s0) | (VALID & ~INPUT_KEY & s2 & ~s1) | (VALID & INPUT_KEY & ~s2 & ~s0);
+    assign s1_ = (s2 & s1 & ~s0) | (VALID & INPUT_KEY & s1 & ~s0) | (VALID & INPUT_KEY & s2 & ~s0) | (VALID & ~INPUT_KEY & ~s2 & ~s1 & s0);
+    assign s2_ = (s2 & s1 & ~s0) | (s2 & ~s1 & s0) | (VALID & s2 & ~s1) | (VALID & ~INPUT_KEY & ~s2 & s1 & s0);
 
+    assign DEBUG_STATE = {s2,s1,s0};
     always @(posedge CLK or posedge RESET)
     begin
         if(RESET)
@@ -46,12 +53,12 @@ module DEC_INPUT_KEY(   output reg ACTIVE,
         end
         else
         begin
-            s0 <= (s2 & ~s1 & s0) | (VALID & ~INPUT_KEY & s2 & ~s1) | (VALID & INPUT_KEY & ~s2 & ~s0);
-            s1 <= (s2 & s1 & ~s0) | (VALID & INPUT_KEY & s1 & ~s0) | (VALID & INPUT_KEY & s2 & ~s0) | (VALID & INPUT_KEY & ~s2 & ~s1 & s0);
-            s2 <= (s2 & s1 & ~s0) | (s2 & ~s1 & s0) | (VALID & s2 & ~s1) | (VALID & ~INPUT_KEY & ~s2 & s1 & s0);
-            ACTIVE <= (s2 & s1 & ~s0) | (s2 & ~s1 & s0);
-
-            DEBUG_STATE = {s2,s1,s0};
+            s0 <= s0_;
+            s1 <= s1_;
+            s2 <= s2_;
+            
+            ACTIVE <= (s2_ & s1_ & ~s0_) | (s2_ & ~s1_ & s0_);
+            MODE <= (s2_ & s1_ & ~s0_);
         end
     end
 endmodule
@@ -86,48 +93,38 @@ module tester();
         RESET = 1;
         VALID_CMD = 0;
 
-#5      RESET = 0;
+#10     RESET = 0;
 
         //fail on the first input
 #10     VALID_CMD = 1;
         INPUT_KEY = 0;
 
         //fail on the second input
-#7     RESET = 1;
+#7      RESET = 1;
 #3      RESET = 0;
-#5      INPUT_KEY = 1;
+        INPUT_KEY = 1;
 #10     INPUT_KEY = 1;
 
         //fail on the third input
-#12     RESET = 1;
+#7      RESET = 1;
 #3      RESET = 0;
-#5      INPUT_KEY = 1;
+        INPUT_KEY = 1;
 #10     INPUT_KEY = 0;
 #10     INPUT_KEY = 0;
 
-        //fail on the fourth input
-#12     RESET = 1;
+        //succeed and enter mode 0
+#7      RESET = 1;
 #3      RESET = 0;
-#5      INPUT_KEY = 1;
-#10     INPUT_KEY = 0;
-#10     INPUT_KEY = 1;
-#10     INPUT_KEY = 1;
-
-        //succeed with mode 0
-#12     RESET = 1;
-#3      RESET = 0;
-#5      INPUT_KEY = 1;
+        INPUT_KEY = 1;
 #10     INPUT_KEY = 0;
 #10     INPUT_KEY = 1;
 #10     INPUT_KEY = 0;
 #10     INPUT_KEY = 0;
 
-#20     
-
-        //succeed with mode 1
-#12     RESET = 1;
+        //succeed and enter mode 1
+#17      RESET = 1;
 #3      RESET = 0;
-#5      INPUT_KEY = 1;
+        INPUT_KEY = 1;
 #10     INPUT_KEY = 0;
 #10     INPUT_KEY = 1;
 #10     INPUT_KEY = 0;

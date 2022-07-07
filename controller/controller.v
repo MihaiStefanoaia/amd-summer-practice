@@ -26,7 +26,7 @@ endmodule
 module DEC_INPUT_KEY(   output reg ACTIVE,
                         output reg MODE,
                         input      INPUT_KEY,
-                        input      VALID_CMD,
+                        input      VALID,
                         input      RESET,
                         input      CLK,
                         output reg [2:0] DEBUG_STATE);
@@ -46,12 +46,10 @@ module DEC_INPUT_KEY(   output reg ACTIVE,
         end
         else
         begin
-            s0 <= (s2 & s0) | (~VALID_CMD & s0) | (VALID_CMD & INPUT_KEY & ~s1) | (VALID_CMD & ~s2 & ~s0) | (~INPUT_KEY & ~s2 & s1 & s0);
-            s1 <= (s2 & s1) | (~VALID_CMD & s1) | (VALID_CMD & s2 & ~s0) | (VALID_CMD & s1 & ~s0) | (VALID_CMD & ~INPUT_KEY & ~s2 & ~s1 & s0);
-            s2 <= (VALID_CMD | s2) & (~INPUT_KEY | s2 |s0) & (INPUT_KEY | s2 | s1 | ~s0);
-
-            MODE   <= s0 & s1 & s2;
-            ACTIVE <= s1 & s2;
+            s0 <= (s2 & ~s1 & s0) | (VALID & ~INPUT_KEY & s2 & ~s1) | (VALID & INPUT_KEY & ~s2 & ~s0);
+            s1 <= (s2 & s1 & ~s0) | (VALID & INPUT_KEY & s1 & ~s0) | (VALID & INPUT_KEY & s2 & ~s0) | (VALID & INPUT_KEY & ~s2 & ~s1 & s0);
+            s2 <= (s2 & s1 & ~s0) | (s2 & ~s1 & s0) | (VALID & s2 & ~s1) | (VALID & ~INPUT_KEY & ~s2 & s1 & s0);
+            ACTIVE <= (s2 & s1 & ~s0) | (s2 & ~s1 & s0);
 
             DEBUG_STATE = {s2,s1,s0};
         end
@@ -95,7 +93,7 @@ module tester();
         INPUT_KEY = 0;
 
         //fail on the second input
-#12     RESET = 1;
+#7     RESET = 1;
 #3      RESET = 0;
 #5      INPUT_KEY = 1;
 #10     INPUT_KEY = 1;

@@ -152,7 +152,7 @@ module CONTROL_RW_FLOW( output reg ACCESS_MEM,
     reg [2:0] state;
     reg [2:0] next_state;
 
-    assign DEBUG = next_state;
+    assign DEBUG = state;
     
     always @(posedge CLK or posedge RESET)
     begin
@@ -284,6 +284,7 @@ module tester();
     begin
         $dumpfile("flow.vcd");
         $dumpvars(0,ACCESS_MEM,RW_MEM,PARALLEL_LOAD,Tx_DATA,BUSY,ACTIVE,MODE,VALID_CMD,RW,Tx_DONE,RESET,CLK,STATE);
+        
         RESET = 1;
         ACTIVE = 1;
         MODE = 0;
@@ -291,11 +292,112 @@ module tester();
         RW = 0;
         Tx_DONE = 0;
 
+        //0
+#10     RESET = 0;
 
-#5      RESET = 0;
+        //0 -> 0
+#10     VALID_CMD = 0;
 
-#20     $finish();
+        //0 -> 1
+#10     VALID_CMD = 1;
+        RW = 0;
+        ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 1;
+
+        //1 -> 2
+#10     ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 1;
+
+        //2 -> 3
+#10     VALID_CMD = 1;
+        RW = 0;
+        ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 0;
+
+        //3 -> 3
+#10     ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 0;
+        
+        //3 -> 0
+#10     VALID_CMD = 1;
+        RW = 0;
+        ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 1;
+
+        //0 -> 1
+#10     VALID_CMD = 1;
+        RW = 0;
+        ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 1;
+
+        //1 -> 2
+#10     ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 1;
+
+        //2 -> 0
+#10     ACTIVE = 1;
+        MODE = 0;
+
+        //0 -> 1
+#10     VALID_CMD = 1;
+        RW = 0;
+        ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 1;
+
+        //1 -> 0
+#10     ACTIVE = 0;
+        MODE = 0;
+        Tx_DONE = 0;
+
+        //0 -> 4
+#10     VALID_CMD = 1;
+        RW = 1;
+        ACTIVE = 1;
+        MODE = 1;
+
+        //4 -> 0 - nothing really
+#10     ACTIVE = 1;
+        MODE = 1;
+        Tx_DONE = 1;
+
+        //0 -> 5
+#10     VALID_CMD = 1;
+        ACTIVE = 1;
+        MODE = 0;
+        Tx_DONE = 1;
+
+        //5 -> 0
+#10     ACTIVE = 0;
+
+        //0 -> 5
+#10     VALID_CMD = 1;
+        ACTIVE = 1;
+        MODE = 0;
+        Tx_DONE = 1;
+
+        //5 -> 6
+#10     ACTIVE = 1;
+        MODE = 0;
+
+        //6 -> 6
+#10     ACTIVE = 1;
+        MODE = 0;
+        Tx_DONE = 0;
+
+        //6 -> 0
+#10     ACTIVE = 1;
+        MODE = 0;
+        Tx_DONE = 1;
+
+#15     $finish();
     end
 
 endmodule
-

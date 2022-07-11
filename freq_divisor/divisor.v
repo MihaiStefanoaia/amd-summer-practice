@@ -12,8 +12,8 @@ module DIV_frecventa(   input [31:0]DIN_n,
     begin
         if(RESET)
         begin
-            conf <= 1;
-            counter <= 0;
+            conf <= 32'b1;
+            counter <= 32'b0;
         end
         else
         begin
@@ -30,10 +30,10 @@ module DIV_frecventa(   input [31:0]DIN_n,
             else
             begin
                 if(conf == 0) //just in case
-                    conf <= 1;
+                    conf <= 32'b1;
 
                 if(conf == (counter + 1))
-                    counter <= 0;
+                    counter <= 32'b0;
                 else
                     counter <= counter + 1;
                 

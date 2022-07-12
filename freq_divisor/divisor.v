@@ -6,12 +6,15 @@ module DIV_frecventa(   input [31:0]DIN_n,
                         output CLK_OUT);
     reg [31:0] conf;
     reg [31:0] counter;
-    assign CLK_OUT = (conf == counter + 1) && ENABLE && CLK;
-
+    wire even;
+    reg odd;
+    assign even = (conf <= counter * 2);
+    assign CLK_OUT = ((conf == 1) ? (CLK) : (even || odd)) && ENABLE;
     always @(posedge CLK)
     begin
         if(RESET)
         begin
+            odd <= 1;
             conf <= 32'b1;
             counter <= 32'b0;
         end
@@ -19,26 +22,39 @@ module DIV_frecventa(   input [31:0]DIN_n,
         begin
             if(!ENABLE)
             begin
-                counter <= conf - 1;
+                counter <= 0;
 
                 if(CONFIG_DIV)
                 begin
                     conf <= DIN_n;
-                    counter <= DIN_n - 1;
+                    counter <= 0;
                 end
             end
             else
             begin
                 if(conf == 0) //just in case
                     conf <= 32'b1;
-
-                if(conf == (counter + 1))
-                    counter <= 32'b0;
                 else
-                    counter <= counter + 1;
-                
+                begin
+                    if(conf == counter + 1)
+                        counter <= 32'b0;
+                    else
+                        counter <= counter + 1;
+                end                
             end
         end
+    end
+
+    always @(negedge CLK) begin
+        if(conf[0] && !odd)
+        begin
+            if(conf == counter + 1)
+            begin
+                odd <= 1;
+            end
+        end
+        else
+            odd <= 0;
     end
 endmodule
 
@@ -63,7 +79,7 @@ module tester();
 
 #20     ENABLE = 0;
         CONFIG_DIV = 1;
-        DIN_n = 5;
+        DIN_n = 3;
 
 #10     ENABLE = 1;
 

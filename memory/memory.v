@@ -1,13 +1,13 @@
 module MEMORY(  output reg [31:0]D_OUT,
                 input [31:0]Din,
-                input [7:0]Addr,
+                input [WIDTH-1:0]Addr,
                 input RW,
                 input Valid, //is this like a chip select/enable?
                 input RESET,
                 input CLK);
     parameter WIDTH = 8;
 
-    reg [7:0]mem [(2 ** WIDTH) - 1 : 0];
+    reg [31:0]mem [(2 ** WIDTH) - 1 : 0];
     integer i;
     always @(posedge CLK or posedge RESET)
     begin
@@ -24,11 +24,11 @@ module MEMORY(  output reg [31:0]D_OUT,
                 if(RW)  //write
                 begin
                     $display("gets here and writes");
-                    {mem[Addr+0],mem[Addr+1],mem[Addr+2],mem[Addr+3]} <= Din;
+                    mem[Addr] <= Din;
                 end
                 else    //read
                 begin
-                    D_OUT <= {mem[Addr+0],mem[Addr+1],mem[Addr+2],mem[Addr+3]};
+                    D_OUT <= mem[Addr];
                 end
             end
         end

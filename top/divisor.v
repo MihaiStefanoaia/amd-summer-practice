@@ -10,7 +10,7 @@ module DIV_frecventa(   input [31:0]DIN_n,
     reg odd;
     assign even = (conf <= counter * 2);
     assign CLK_OUT = ((conf == 1) ? (CLK) : (even || odd)) && ENABLE;
-    always @(posedge CLK)
+    always @(posedge CLK or posedge RESET)
     begin
         if(RESET)
         begin

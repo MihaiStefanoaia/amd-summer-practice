@@ -23,7 +23,7 @@ module MEMORY(  output reg [31:0]D_OUT,
             begin
                 if(RW)  //write
                 begin
-                    $display("gets here and writes");
+                    //$display("gets here and writes");
                     mem[Addr] <= Din;
                 end
                 else    //read

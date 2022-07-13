@@ -94,9 +94,9 @@ module CONTROL_RW_FLOW( output reg ACCESS_MEM,
     begin
         case(state)
             0:begin
-                if(VALID_CMD == 1 && RW == 0 && ACTIVE == 1 && MODE == 1 && Tx_DONE == 1) next_state <= 1;
+                if(VALID_CMD == 1 && RW == 0 && ACTIVE == 1 && MODE == 1) next_state <= 1;
                 else if(VALID_CMD == 1 && RW == 1 && ACTIVE == 1 && MODE == 1) next_state <= 4;
-                else if(VALID_CMD == 1 && ACTIVE == 1 && MODE == 0 && Tx_DONE == 1) next_state <= 5;
+                else if(VALID_CMD == 1 && ACTIVE == 1 && MODE == 0) next_state <= 5;
                 else next_state <= 0;
             end
             1:begin
@@ -167,14 +167,14 @@ module CONTROL_RW_FLOW( output reg ACCESS_MEM,
                 ACCESS_MEM <= 0;
                 RW_MEM <= 0;
                 PARALLEL_LOAD <= 1;
-                Tx_DATA <= 1;
+                Tx_DATA <= 0;
                 BUSY <= 1;
             end
             6:begin
                 ACCESS_MEM <= 0;
                 RW_MEM <= 0;
                 PARALLEL_LOAD <= 0;
-                Tx_DATA <= 0;
+                Tx_DATA <= 1;
                 BUSY <= 1;
             end
         endcase

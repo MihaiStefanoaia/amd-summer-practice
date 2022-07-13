@@ -100,7 +100,7 @@ module CONTROL_RW_FLOW( output reg ACCESS_MEM,
                 else next_state <= 0;
             end
             1:begin
-                if(ACTIVE == 1 && MODE == 1 && Tx_DONE == 1) next_state <= 2;
+                if(ACTIVE == 1 && MODE == 1) next_state <= 2;
                 else next_state <= 0;
             end
             2:begin
@@ -146,14 +146,14 @@ module CONTROL_RW_FLOW( output reg ACCESS_MEM,
                 ACCESS_MEM <= 0;
                 RW_MEM <= 0;
                 PARALLEL_LOAD <= 1;
-                Tx_DATA <= 1;
+                Tx_DATA <= 0;
                 BUSY <= 1;
             end
             3:begin
                 ACCESS_MEM <= 0;
                 RW_MEM <= 0;
                 PARALLEL_LOAD <= 0;
-                Tx_DATA <= 0;
+                Tx_DATA <= 1;
                 BUSY <= 1;
             end
             4:begin

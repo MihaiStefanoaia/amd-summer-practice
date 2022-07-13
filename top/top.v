@@ -14,8 +14,7 @@ module BINARY_CALC( input INPUT_KEY,
                     output D_OUT,
                     output CLK_Tx,
                     input RESET,
-                    input CLK,
-                    output [31:0] DEBUG);
+                    input CLK);
     localparam ZERO = 8'b0;
     
     wire CTRL_ACTIVE;
@@ -111,6 +110,5 @@ module BINARY_CALC( input INPUT_KEY,
                             .ENABLE(CTRL_TRANSFER_DATA),
                             .CLK_OUT(CLK_TX_TMP));
 
-    assign DEBUG = PARALLEL_DATA_OUT;
                             
 endmodule

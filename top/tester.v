@@ -16,7 +16,6 @@ module tester();
     wire CLK_Tx;
     reg RESET;
     wire CLK;
-    wire [31:0]DEBUG;
 
     Clock clk(CLK);
     BINARY_CALC CALC(   .INPUT_KEY(INPUT_KEY),
@@ -35,12 +34,13 @@ module tester();
                         .D_OUT(D_OUT),
                         .CLK_Tx(CLK_Tx),
                         .RESET(RESET),
-                        .CLK(CLK),
-                        .DEBUG(DEBUG));
+                        .CLK(CLK));
 
     initial begin
         $dumpfile("dump.vcd");
-        $dumpvars(0,INPUT_KEY,VALID_CMD,CALC_ACTIVE,CALC_MODE,CLK);//check for proper activation
+        $dumpvars(0);
+        //$dumpvars(0,INPUT_KEY,VALID_CMD,CALC_ACTIVE,CALC_MODE,CLK,RESET,D_OUT_VALID,D_OUT,CLK_Tx);//all of it
+        //$dumpvars(0,INPUT_KEY,VALID_CMD,CALC_ACTIVE,CALC_MODE,CLK,RESET);//check for proper activation
         //$dumpvars(0,D_OUT_VALID,D_OUT,CLK_Tx,DEBUG);//check for transfer
         RESET = 1;
         
@@ -60,24 +60,33 @@ module tester();
 #10     INPUT_KEY = 0;
 #10     INPUT_KEY = 1;
 #10     INPUT_KEY = 0;
-#10     INPUT_KEY = 0; //activates and starts in mode 0
+#10     INPUT_KEY = 0; //activate and start in mode 0
 
 //setup the freq divisor
-#10     DIN = 2;
+#10     DIN = 1;
         CONFIG_DIV = 1;
 #10     CONFIG_DIV = 0;
 
 //transfer the data over serial - success
-#640    RESET = 1;
+#500    RESET = 1;
+
+
 //reset the system
 #20     RESET = 0;
         INPUT_KEY = 1;
 #10     INPUT_KEY = 0;
 #10     INPUT_KEY = 1;
 #10     INPUT_KEY = 0;
-#10     INPUT_KEY = 1; //activates and starts in mode 1
+#10     INPUT_KEY = 1; //activate and start in mode 1
+
+//setup the freq divisor
+#10     DIN = 2;
+        CONFIG_DIV = 1;
+#10     CONFIG_DIV = 0;
+
+
 //setup and save the first calculation
-        VALID_CMD = 0;
+#10     VALID_CMD = 0;
         ADDR = 0;
         RW_MEM = 1;
 
@@ -94,11 +103,11 @@ module tester();
         ADDR = 0;
         RW_MEM = 0;
 #10     VALID_CMD = 1;
-#640    VALID_CMD = 0;
+#670    VALID_CMD = 0;
         ADDR = 5;
 
 #10     VALID_CMD = 1;
-#640    VALID_CMD = 0;
+#670    VALID_CMD = 0;
 
 #50     $finish();
 

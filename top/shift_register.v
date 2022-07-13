@@ -42,16 +42,8 @@ module REGISTRU_SHIFT_PARALLELLOAD( input [31:0]DIN,
                 end
             end
         end
-
-        if(done)
-        begin
-            TX_DONE <= 1;
-            done <= 0;
-        end
-        else
-        begin
-            TX_DONE <= 0;
-        end
+        
+        TX_DONE <= 0;
     end
 
     always @(posedge CLK_Tx)
@@ -66,6 +58,7 @@ module REGISTRU_SHIFT_PARALLELLOAD( input [31:0]DIN,
             else
             begin
                 serial_enable <= 0;
+                TX_DONE <= 1;
                 done <= 1;
             end
         end
